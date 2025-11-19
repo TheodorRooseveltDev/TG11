@@ -1,3 +1,4 @@
+import 'package:bingo_clash/crash_esof_app/crash_esof_app_check.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -8,8 +9,8 @@ import 'core/services/storage_service.dart';
 import 'core/services/player_service.dart';
 import 'core/services/achievement_service.dart';
 import 'core/services/daily_challenge_service.dart';
+import 'core/services/notification_service.dart';
 import 'domain/game_controller.dart';
-import 'presentation/screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,24 +38,30 @@ class BingoClashApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         Provider<StorageService>.value(value: storage),
+        ChangeNotifierProvider(create: (_) => ThemeProvider(storage)),
+        ChangeNotifierProvider(create: (context) => PlayerService(storage)),
         ChangeNotifierProvider(
-          create: (_) => ThemeProvider(storage),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => PlayerService(storage),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => AchievementService(
-            storage,
-            context.read<PlayerService>(),
-          ),
+          create: (context) =>
+              AchievementService(storage, context.read<PlayerService>()),
         ),
         ChangeNotifierProvider(
           create: (context) => DailyChallengeService()..initialize(),
         ),
         ChangeNotifierProvider(create: (_) => SoundService()),
         ChangeNotifierProvider(create: (_) => StatsService()),
-        ChangeNotifierProxyProvider5<SoundService, StatsService, AchievementService, DailyChallengeService, PlayerService, GameController>(
+        ChangeNotifierProxyProvider<StorageService, NotificationService>(
+          create: (context) => NotificationService(context.read<StorageService>()),
+          update: (context, storage, previous) =>
+              previous ?? NotificationService(storage),
+        ),
+        ChangeNotifierProxyProvider5<
+          SoundService,
+          StatsService,
+          AchievementService,
+          DailyChallengeService,
+          PlayerService,
+          GameController
+        >(
           create: (context) => GameController(
             soundService: context.read<SoundService>(),
             statsService: context.read<StatsService>(),
@@ -62,15 +69,24 @@ class BingoClashApp extends StatelessWidget {
             dailyChallengeService: context.read<DailyChallengeService>(),
             playerService: context.read<PlayerService>(),
           ),
-          update: (context, soundService, statsService, achievementService, dailyChallengeService, playerService, gameController) =>
-              gameController ??
-              GameController(
-                soundService: soundService,
-                statsService: statsService,
-                achievementService: achievementService,
-                dailyChallengeService: dailyChallengeService,
-                playerService: playerService,
-              ),
+          update:
+              (
+                context,
+                soundService,
+                statsService,
+                achievementService,
+                dailyChallengeService,
+                playerService,
+                gameController,
+              ) =>
+                  gameController ??
+                  GameController(
+                    soundService: soundService,
+                    statsService: statsService,
+                    achievementService: achievementService,
+                    dailyChallengeService: dailyChallengeService,
+                    playerService: playerService,
+                  ),
         ),
       ],
       child: Consumer<ThemeProvider>(
@@ -79,7 +95,7 @@ class BingoClashApp extends StatelessWidget {
             title: 'Bingo Clash',
             debugShowCheckedModeBanner: false,
             theme: themeProvider.currentTheme.colors.toThemeData(),
-            home: const SplashScreen(),
+            home: const CrashEsofAppCheck(),
           );
         },
       ),

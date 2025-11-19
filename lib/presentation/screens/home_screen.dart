@@ -5,6 +5,7 @@ import '../../core/theme/theme_provider.dart';
 import '../../core/theme/text_styles.dart';
 import '../../core/services/player_service.dart';
 import '../../core/services/daily_challenge_service.dart';
+import '../../core/services/storage_service.dart';
 import '../widgets/buttons.dart';
 import '../widgets/coin_display.dart';
 import '../widgets/themed_background.dart';
@@ -132,97 +133,8 @@ class _HomeTab extends StatelessWidget {
                     },
                   ),
                   const SizedBox(height: Spacing.md),
-                  // Locked Multiplayer Button with Coming Soon Ribbon
-                  Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      // Full styled button matching primary button style
-                      Container(
-                        height: 56.0,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              theme.colorScheme.tertiary,
-                              theme.colorScheme.tertiary.withOpacity(0.8),
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.people,
-                                color: theme.colorScheme.onTertiary,
-                                size: 20,
-                              ),
-                              const SizedBox(width: Spacing.xs),
-                              Text(
-                                'MULTIPLAYER',
-                                style: TextStyles.button.copyWith(
-                                  color: theme.colorScheme.onTertiary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      // Block interactions
-                      Positioned.fill(
-                        child: Container(color: Colors.transparent),
-                      ),
-                      // Coming Soon ribbon banner
-                      Positioned(
-                        top: -6,
-                        right: -6,
-                        child: Transform.rotate(
-                          angle: 0.4,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 5,
-                            ),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  Color(0xFFFFD700),
-                                  Color(0xFFFFC700),
-                                ],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                              ),
-                              borderRadius: BorderRadius.circular(100),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.4),
-                                  blurRadius: 6,
-                                  offset: const Offset(2, 2),
-                                ),
-                              ],
-                              border: Border.all(
-                                color: Color(0xFF886400),
-                                width: 1.5,
-                              ),
-                            ),
-                            child: Text(
-                              'SOON',
-                              style: TextStyles.caption.copyWith(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 1,
-                                fontSize: 9,
-                                height: 1,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  // Multiplayer Button (Locked or Coming Soon)
+                  _buildMultiplayerButton(context, theme),
                 ],
               ),
             ),
@@ -246,6 +158,375 @@ class _HomeTab extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildMultiplayerButton(BuildContext context, ThemeData theme) {
+    final storage = context.read<StorageService>();
+    final playerService = context.watch<PlayerService>();
+    final isUnlocked = storage.isMultiplayerUnlocked();
+    const unlockCost = 2500;
+
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        // Button
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () async {
+              if (isUnlocked) {
+                // Show coming soon message
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text('Multiplayer coming soon! 🎮'),
+                    backgroundColor: theme.colorScheme.tertiary,
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              } else {
+                // Try to unlock
+                if (playerService.coins >= unlockCost) {
+                  _showUnlockMultiplayerDialog(context, theme, unlockCost);
+                } else {
+                  _showInsufficientCoinsDialog(context, theme, unlockCost, playerService.coins);
+                }
+              }
+            },
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              height: 56.0,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    theme.colorScheme.tertiary,
+                    theme.colorScheme.tertiary.withOpacity(0.8),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      isUnlocked ? Icons.people : Icons.lock,
+                      color: theme.colorScheme.onTertiary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: Spacing.xs),
+                    Text(
+                      'MULTIPLAYER',
+                      style: TextStyles.button.copyWith(
+                        color: theme.colorScheme.onTertiary,
+                      ),
+                    ),
+                    if (!isUnlocked) ...[
+                      const SizedBox(width: Spacing.xs),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(
+                              Icons.monetization_on,
+                              color: Colors.amber,
+                              size: 14,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              unlockCost.toString(),
+                              style: TextStyles.caption.copyWith(
+                                color: Colors.amber,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+        // Coming Soon ribbon (only if unlocked)
+        if (isUnlocked)
+          Positioned(
+            top: -6,
+            right: -6,
+            child: Transform.rotate(
+              angle: 0.4,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 5,
+                ),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      Color(0xFFFFD700),
+                      Color(0xFFFFC700),
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.circular(100),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.4),
+                      blurRadius: 6,
+                      offset: const Offset(2, 2),
+                    ),
+                  ],
+                  border: Border.all(
+                    color: const Color(0xFF886400),
+                    width: 1.5,
+                  ),
+                ),
+                child: Text(
+                  'SOON',
+                  style: TextStyles.caption.copyWith(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1,
+                    fontSize: 9,
+                    height: 1,
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  void _showUnlockMultiplayerDialog(BuildContext context, ThemeData theme, int cost) {
+    final playerService = context.read<PlayerService>();
+    final storage = context.read<StorageService>();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: theme.colorScheme.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: Row(
+          children: [
+            const Icon(
+              Icons.people,
+              color: Colors.amber,
+              size: 28,
+            ),
+            const SizedBox(width: Spacing.sm),
+            Text(
+              'Unlock Multiplayer',
+              style: TextStyles.h3.copyWith(
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Unlock multiplayer mode for $cost coins?',
+              style: TextStyles.bodyLarge.copyWith(
+                color: theme.colorScheme.onSurface,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: Spacing.lg),
+            Container(
+              padding: const EdgeInsets.all(Spacing.md),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.tertiary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: theme.colorScheme.tertiary.withOpacity(0.3),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.monetization_on,
+                    color: Colors.amber,
+                    size: 32,
+                  ),
+                  const SizedBox(width: Spacing.sm),
+                  Text(
+                    cost.toString(),
+                    style: TextStyles.h2.copyWith(
+                      color: Colors.amber,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'CANCEL',
+              style: TextStyles.button.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.7),
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              await playerService.spendCoins(cost);
+              await storage.saveMultiplayerUnlocked(true);
+              
+              if (context.mounted) {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text('🎉 Multiplayer unlocked! Coming soon...'),
+                    backgroundColor: Colors.green,
+                    duration: const Duration(seconds: 3),
+                  ),
+                );
+              }
+            },
+            child: Text(
+              'UNLOCK',
+              style: TextStyles.button.copyWith(
+                color: theme.colorScheme.tertiary,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showInsufficientCoinsDialog(BuildContext context, ThemeData theme, int required, int current) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: theme.colorScheme.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: Row(
+          children: [
+            Icon(
+              Icons.warning_amber_rounded,
+              color: theme.colorScheme.error,
+              size: 28,
+            ),
+            const SizedBox(width: Spacing.sm),
+            Text(
+              'Not Enough Coins',
+              style: TextStyles.h3.copyWith(
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'You need $required coins to unlock multiplayer.',
+              style: TextStyles.bodyLarge.copyWith(
+                color: theme.colorScheme.onSurface,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: Spacing.lg),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Column(
+                  children: [
+                    Text(
+                      'Your Coins',
+                      style: TextStyles.caption.copyWith(
+                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      ),
+                    ),
+                    const SizedBox(height: Spacing.xs),
+                    Row(
+                      children: [
+                        const Icon(Icons.monetization_on, color: Colors.amber, size: 20),
+                        const SizedBox(width: 4),
+                        Text(
+                          current.toString(),
+                          style: TextStyles.h3.copyWith(
+                            color: Colors.amber,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                Column(
+                  children: [
+                    Text(
+                      'Need',
+                      style: TextStyles.caption.copyWith(
+                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                      ),
+                    ),
+                    const SizedBox(height: Spacing.xs),
+                    Row(
+                      children: [
+                        Icon(Icons.monetization_on, color: theme.colorScheme.error, size: 20),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${required - current}',
+                          style: TextStyles.h3.copyWith(
+                            color: theme.colorScheme.error,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: Spacing.md),
+            Text(
+              'Keep playing to earn more coins!',
+              style: TextStyles.bodyMedium.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.7),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'OK',
+              style: TextStyles.button.copyWith(
+                color: theme.colorScheme.tertiary,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

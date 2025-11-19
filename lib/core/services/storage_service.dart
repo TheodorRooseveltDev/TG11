@@ -16,6 +16,8 @@ class StorageService {
   static const String _keyMusicEnabled = 'music_enabled';
   static const String _keyEffectsVolume = 'effects_volume';
   static const String _keyMusicVolume = 'music_volume';
+  static const String _keyNotificationsEnabled = 'notifications_enabled';
+  static const String _keyNotificationsPermissionGranted = 'notifications_permission_granted';
   
   // Achievement tracking
   static const String _keyUnlockedAchievements = 'unlocked_achievements';
@@ -23,6 +25,7 @@ class StorageService {
   static const String _keyCompletedPatterns = 'completed_patterns';
   static const String _keyTotalGames = 'total_games';
   static const String _keyTotalWins = 'total_wins';
+  static const String _keyMultiplayerUnlocked = 'multiplayer_unlocked';
 
   late SharedPreferences _prefs;
   bool _isInitialized = false;
@@ -170,6 +173,27 @@ class StorageService {
     return _prefs.getDouble(_keyMusicVolume) ?? 0.3;
   }
 
+  // Notifications Settings
+  Future<void> saveNotificationsEnabled(bool enabled) async {
+    _checkInitialized();
+    await _prefs.setBool(_keyNotificationsEnabled, enabled);
+  }
+
+  bool isNotificationsEnabled() {
+    _checkInitialized();
+    return _prefs.getBool(_keyNotificationsEnabled) ?? false;
+  }
+
+  Future<void> saveNotificationsPermissionGranted(bool granted) async {
+    _checkInitialized();
+    await _prefs.setBool(_keyNotificationsPermissionGranted, granted);
+  }
+
+  bool isNotificationsPermissionGranted() {
+    _checkInitialized();
+    return _prefs.getBool(_keyNotificationsPermissionGranted) ?? false;
+  }
+
   // Achievement tracking
   Future<void> saveUnlockedAchievements(List<Map<String, dynamic>> achievements) async {
     _checkInitialized();
@@ -224,6 +248,17 @@ class StorageService {
   int getTotalWins() {
     _checkInitialized();
     return _prefs.getInt(_keyTotalWins) ?? 0;
+  }
+
+  // Multiplayer unlock
+  Future<void> saveMultiplayerUnlocked(bool unlocked) async {
+    _checkInitialized();
+    await _prefs.setBool(_keyMultiplayerUnlocked, unlocked);
+  }
+
+  bool isMultiplayerUnlocked() {
+    _checkInitialized();
+    return _prefs.getBool(_keyMultiplayerUnlocked) ?? false;
   }
 
   // Clear all data

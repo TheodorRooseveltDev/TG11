@@ -78,36 +78,36 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return ThemedBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
+        resizeToAvoidBottomInset: true,
         body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(Spacing.xl),
-            child: Column(
-              children: [
-                // Progress indicator
-                Row(
-                  children: [
-                    Expanded(
-                      child: LinearProgressIndicator(
-                        value: (_currentStep + 1) / 2,
-                        backgroundColor: theme.colorScheme.surface.withOpacity(0.3),
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          theme.colorScheme.tertiary,
-                        ),
-                      ),
-                    ),
-                  ],
+          child: Column(
+            children: [
+              // Progress indicator
+              Padding(
+                padding: const EdgeInsets.all(Spacing.xl),
+                child: LinearProgressIndicator(
+                  value: (_currentStep + 1) / 2,
+                  backgroundColor: theme.colorScheme.surface.withOpacity(0.3),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    theme.colorScheme.tertiary,
+                  ),
                 ),
-                const SizedBox(height: Spacing.xl),
+              ),
 
-                // Content
-                Expanded(
+              // Content (scrollable)
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: Spacing.xl),
                   child: _currentStep == 0
                       ? _buildNameStep(theme)
                       : _buildAvatarStep(theme),
                 ),
+              ),
 
-                // Navigation buttons
-                Row(
+              // Navigation buttons (fixed at bottom)
+              Padding(
+                padding: const EdgeInsets.all(Spacing.xl),
+                child: Row(
                   children: [
                     if (_currentStep > 0)
                       Expanded(
@@ -127,8 +127,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -137,8 +137,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget _buildNameStep(ThemeData theme) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
+        const SizedBox(height: Spacing.xxl),
+        
         // Welcome text
         Text(
           'WELCOME TO',
@@ -231,8 +233,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget _buildAvatarStep(ThemeData theme) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
+        const SizedBox(height: Spacing.xl),
+        
         Text(
           'Choose Your Avatar',
           style: TextStyles.h2.copyWith(
@@ -250,17 +254,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         const SizedBox(height: Spacing.xxl),
 
         // Avatar grid
-        Expanded(
-          child: GridView.builder(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              crossAxisSpacing: Spacing.md,
-              mainAxisSpacing: Spacing.md,
-              childAspectRatio: 1,
-            ),
-            itemCount: _avatars.length,
-            shrinkWrap: true,
-            itemBuilder: (context, index) {
+        GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            crossAxisSpacing: Spacing.md,
+            mainAxisSpacing: Spacing.md,
+            childAspectRatio: 1,
+          ),
+          itemCount: _avatars.length,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemBuilder: (context, index) {
               final avatarId = _avatars[index];
               final isSelected = _selectedAvatar == avatarId;
 
@@ -311,8 +315,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
               );
             },
-          ),
         ),
+        const SizedBox(height: Spacing.xl),
       ],
     );
   }

@@ -4,6 +4,7 @@ import '../../core/services/player_service.dart';
 import '../../core/services/storage_service.dart';
 import '../../core/services/sound_service.dart';
 import '../../core/services/stats_service.dart';
+import '../../core/services/notification_service.dart';
 import '../../core/constants/spacing.dart';
 import '../../core/theme/text_styles.dart';
 import '../widgets/themed_background.dart';
@@ -19,6 +20,7 @@ class SettingsScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final playerService = context.watch<PlayerService>();
     final soundService = context.watch<SoundService>();
+    final notificationService = context.watch<NotificationService>();
     final storage = context.read<StorageService>();
 
     return ThemedBackground(
@@ -49,6 +51,11 @@ class SettingsScreen extends StatelessWidget {
             // Audio Settings Section
             _buildSectionHeader(context, 'Audio'),
             _buildAudioSettings(context, soundService, storage),
+            const SizedBox(height: Spacing.xl),
+
+            // Notifications Section
+            _buildSectionHeader(context, 'Notifications'),
+            _buildNotificationsSettings(context, notificationService, storage),
             const SizedBox(height: Spacing.xl),
 
             // Data & Privacy Section
@@ -190,6 +197,46 @@ class SettingsScreen extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildNotificationsSettings(
+    BuildContext context,
+    NotificationService notificationService,
+    StorageService storage,
+  ) {
+    final theme = Theme.of(context);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.colorScheme.tertiary.withOpacity(0.3),
+          width: 2,
+        ),
+      ),
+      child: SwitchListTile(
+        title: Text(
+          'Push Notifications',
+          style: TextStyles.bodyMedium.copyWith(
+            color: theme.colorScheme.onPrimary,
+          ),
+        ),
+        subtitle: Text(
+          notificationService.permissionGranted
+              ? 'Receive game updates and reminders'
+              : 'Enable to receive notifications',
+          style: TextStyles.caption.copyWith(
+            color: theme.colorScheme.onSurface.withOpacity(0.7),
+          ),
+        ),
+        value: notificationService.notificationsEnabled && notificationService.permissionGranted,
+        onChanged: (value) async {
+          await notificationService.toggleNotifications();
+        },
+        activeColor: theme.colorScheme.tertiary,
       ),
     );
   }
