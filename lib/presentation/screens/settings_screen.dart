@@ -9,6 +9,7 @@ import '../../core/constants/spacing.dart';
 import '../../core/theme/text_styles.dart';
 import '../widgets/themed_background.dart';
 import 'webview_screen.dart';
+import 'support_screen.dart';
 
 /// Settings Screen
 /// App settings and user preferences
@@ -66,6 +67,11 @@ class SettingsScreen extends StatelessWidget {
             // Legal Section
             _buildSectionHeader(context, 'Legal'),
             _buildLegalSection(context),
+            const SizedBox(height: Spacing.xl),
+
+            // Support Section
+            _buildSectionHeader(context, 'Support'),
+            _buildSupportSection(context),
             const SizedBox(height: Spacing.xl),
 
             // About Section
@@ -499,6 +505,49 @@ class SettingsScreen extends StatelessWidget {
             },
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSupportSection(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.colorScheme.tertiary.withOpacity(0.3),
+          width: 2,
+        ),
+      ),
+      child: ListTile(
+        leading: Icon(Icons.support_agent, color: theme.colorScheme.tertiary),
+        title: Text(
+          'Contact Support',
+          style: TextStyles.bodyMedium.copyWith(
+            color: theme.colorScheme.onPrimary,
+          ),
+        ),
+        subtitle: Text(
+          'Get help with issues or questions',
+          style: TextStyles.caption.copyWith(
+            color: theme.colorScheme.onSurface.withOpacity(0.7),
+          ),
+        ),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          color: theme.colorScheme.onSurface.withOpacity(0.5),
+          size: 16,
+        ),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const SupportScreen(),
+            ),
+          );
+        },
       ),
     );
   }

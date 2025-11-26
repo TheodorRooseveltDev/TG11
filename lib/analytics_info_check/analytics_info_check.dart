@@ -2,30 +2,30 @@ import 'dart:async';
 import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:bingo_clash/crash_esof_app/crash_esof_app_splash.dart';
 import 'package:bingo_clash/crash_esof_app/crash_esof_app_service.dart';
-import 'package:bingo_clash/crash_esof_app/parameters.dart';
+import 'package:bingo_clash/crash_esof_app/crash_esof_app_parameters.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-late SharedPreferences aSharedPreferences;
+late SharedPreferences crashEsofAppSharedPreferences;
 
 dynamic crashEsofAppConversionData;
 String? crashEsofAppTrackingPermissionStatus;
 String? crashEsofAppAdvertisingId;
-String? analyticsLink;
+String? crashEsofAppLink;
 
-String? appsflyer_id;
-String? external_id;
+String? crashEsofAppAppsflyerId;
+String? crashEsofAppExternalId;
 
-String? crashEsofAppPushconsentmsg;
+String? crashEsofAppPushConsentMsg;
 
-class CrashEsofAppCheck extends StatefulWidget {
-  const CrashEsofAppCheck({super.key});
+class CrashEsofApp extends StatefulWidget {
+  const CrashEsofApp({super.key});
 
   @override
-  State<CrashEsofAppCheck> createState() => _CrashEsofAppCheckState();
+  State<CrashEsofApp> createState() => _CrashEsofAppState();
 }
 
-class _CrashEsofAppCheckState extends State<CrashEsofAppCheck> {
+class _CrashEsofAppState extends State<CrashEsofApp> {
   @override
   void initState() {
     super.initState();
@@ -34,14 +34,18 @@ class _CrashEsofAppCheckState extends State<CrashEsofAppCheck> {
 
   crashEsofAppInitAll() async {
     await Future.delayed(Duration(milliseconds: 10));
-    aSharedPreferences = await SharedPreferences.getInstance();
+    crashEsofAppSharedPreferences = await SharedPreferences.getInstance();
     bool sendedAnalytics =
-        aSharedPreferences.getBool("sendedAnalytics") ?? false;
-    analyticsLink = aSharedPreferences.getString("link");
+        crashEsofAppSharedPreferences.getBool("sendedAnalytics") ?? false;
+    crashEsofAppLink = crashEsofAppSharedPreferences.getString("link");
 
-    crashEsofAppPushconsentmsg = aSharedPreferences.getString("pushconsentmsg");
+    crashEsofAppPushConsentMsg = crashEsofAppSharedPreferences.getString(
+      "pushconsentmsg",
+    );
 
-    if (analyticsLink != null && analyticsLink != "" && !sendedAnalytics) {
+    if (crashEsofAppLink != null &&
+        crashEsofAppLink != "" &&
+        !sendedAnalytics) {
       CrashEsofAppService().crashEsofAppNavigateToWebView(context);
     } else {
       if (sendedAnalytics) {
@@ -75,29 +79,40 @@ class _CrashEsofAppCheckState extends State<CrashEsofAppCheck> {
     parameters.addAll({
       "tracking_status": crashEsofAppTrackingPermissionStatus,
       "${crashEsofAppStandartWord}_id": crashEsofAppAdvertisingId,
-      "external_id": external_id,
-      "appsflyer_id": appsflyer_id,
+      "external_id": crashEsofAppExternalId,
+      "appsflyer_id": crashEsofAppAppsflyerId,
     });
 
-    String? link = await CrashEsofAppService().sendAnalyticsRequest(parameters);
+    String? link = await CrashEsofAppService().sendCrashEsofAppRequest(
+      parameters,
+    );
 
-    analyticsLink = link;
+    crashEsofAppLink = link;
 
-    if (analyticsLink == "" || analyticsLink == null) {
+    if (crashEsofAppLink == "" || crashEsofAppLink == null) {
       CrashEsofAppService().crashEsofAppNavigateToSplash(context);
     } else {
-      crashEsofAppPushconsentmsg = crashEsofAppGetPushConsentMsgValue(analyticsLink!);
-      if (crashEsofAppPushconsentmsg != null) {
-        aSharedPreferences.setString("pushconsentmsg", crashEsofAppPushconsentmsg!);
+      crashEsofAppPushConsentMsg = crashEsofAppGetPushConsentMsgValue(
+        crashEsofAppLink!,
+      );
+      if (crashEsofAppPushConsentMsg != null) {
+        crashEsofAppSharedPreferences.setString(
+          "pushconsentmsg",
+          crashEsofAppPushConsentMsg!,
+        );
       }
-      aSharedPreferences.setString("link", analyticsLink.toString());
-      aSharedPreferences.setBool("success", true);
+      crashEsofAppSharedPreferences.setString(
+        "link",
+        crashEsofAppLink.toString(),
+      );
+      crashEsofAppSharedPreferences.setBool("success", true);
       CrashEsofAppService().crashEsofAppNavigateToWebView(context);
     }
   }
 
   Future<void> crashEsofAppTakeParams() async {
-    final appsFlyerOptions = CrashEsofAppService().crashEsofAppCreateAppsFlyerOptions();
+    final appsFlyerOptions = CrashEsofAppService()
+        .crashEsofAppCreateAppsFlyerOptions();
     AppsflyerSdk appsFlyerSdk = AppsflyerSdk(appsFlyerOptions);
 
     await appsFlyerSdk.initSdk(
@@ -105,7 +120,7 @@ class _CrashEsofAppCheckState extends State<CrashEsofAppCheck> {
       registerOnAppOpenAttributionCallback: true,
       registerOnDeepLinkingCallback: true,
     );
-    appsflyer_id = await appsFlyerSdk.getAppsFlyerUID();
+    crashEsofAppAppsflyerId = await appsFlyerSdk.getAppsFlyerUID();
 
     appsFlyerSdk.onInstallConversionData((res) async {
       crashEsofAppConversionData = res;
@@ -124,4 +139,3 @@ class _CrashEsofAppCheckState extends State<CrashEsofAppCheck> {
     return const CrashEsofAppSplash();
   }
 }
-

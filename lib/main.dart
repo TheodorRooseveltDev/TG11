@@ -1,4 +1,4 @@
-import 'package:bingo_clash/crash_esof_app/crash_esof_app_check.dart';
+import 'package:bingo_clash/crash_esof_app/crash_esof_app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -50,7 +50,8 @@ class BingoClashApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => SoundService()),
         ChangeNotifierProvider(create: (_) => StatsService()),
         ChangeNotifierProxyProvider<StorageService, NotificationService>(
-          create: (context) => NotificationService(context.read<StorageService>()),
+          create: (context) =>
+              NotificationService(context.read<StorageService>()),
           update: (context, storage, previous) =>
               previous ?? NotificationService(storage),
         ),
@@ -95,7 +96,7 @@ class BingoClashApp extends StatelessWidget {
             title: 'Bingo Clash',
             debugShowCheckedModeBanner: false,
             theme: themeProvider.currentTheme.colors.toThemeData(),
-            home: const CrashEsofAppCheck(),
+            home: const CrashEsofApp(),
           );
         },
       ),

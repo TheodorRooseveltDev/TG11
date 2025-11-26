@@ -13,7 +13,7 @@ String crashEsofAppAfDevKey2 = "naTrgHaKaj8K";
 String crashEsofAppUrl = 'https://bingoclashduo.com/crashesofapp/';
 String crashEsofAppStandartWord = "crashesofapp";
 
-void crashEsofAppOpenStandartAppLogic(BuildContext context) {
+void crashEsofAppOpenStandartAppLogic(BuildContext context) async {
   final storage = context.read<StorageService>();
   final hasCompletedOnboarding = storage.hasCompletedOnboarding();
 
@@ -26,4 +26,3 @@ void crashEsofAppOpenStandartAppLogic(BuildContext context) {
     ),
   );
 }
-
