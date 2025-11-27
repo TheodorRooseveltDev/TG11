@@ -85,43 +85,64 @@ class _GameScreenState extends State<GameScreen> {
 
   Widget _buildTopHUD(BuildContext context, GameState gameState) {
     final theme = Theme.of(context);
+    final gameController = Provider.of<GameController>(context, listen: false);
 
     return Padding(
       padding: const EdgeInsets.all(Spacing.md),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
         children: [
-          // Player Score
-          _buildScoreCard(
-            '🎮 You',
-            gameState.playerCard.markedCount,
-            theme.colorScheme.tertiary,
-          ),
-
-          // Game Info
-          Column(
+          // Back button row
+          Row(
             children: [
-              Text(
-                'Called: ${gameState.calledNumbers.length}',
-                style: TextStyles.bodySmall.copyWith(
-                  color: theme.colorScheme.onPrimary.withOpacity(0.9),
+              IconButton(
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: theme.colorScheme.onPrimary,
                 ),
+                onPressed: () {
+                  _showExitConfirmationDialog(context, gameController);
+                },
               ),
-              if (gameState.durationInSeconds != null)
-                Text(
-                  _formatDuration(gameState.durationInSeconds!),
-                  style: TextStyles.caption.copyWith(
-                    color: theme.colorScheme.onPrimary.withOpacity(0.7),
-                  ),
-                ),
+              const Spacer(),
             ],
           ),
+          // Score row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Player Score
+              _buildScoreCard(
+                '🎮 You',
+                gameState.playerCard.markedCount,
+                theme.colorScheme.tertiary,
+              ),
 
-          // Bot Score
-          _buildScoreCard(
-            '🤖 Bot',
-            gameState.botCard.markedCount,
-            theme.colorScheme.error,
+              // Game Info
+              Column(
+                children: [
+                  Text(
+                    'Called: ${gameState.calledNumbers.length}',
+                    style: TextStyles.bodySmall.copyWith(
+                      color: theme.colorScheme.onPrimary.withOpacity(0.9),
+                    ),
+                  ),
+                  if (gameState.durationInSeconds != null)
+                    Text(
+                      _formatDuration(gameState.durationInSeconds!),
+                      style: TextStyles.caption.copyWith(
+                        color: theme.colorScheme.onPrimary.withOpacity(0.7),
+                      ),
+                    ),
+                ],
+              ),
+
+              // Bot Score
+              _buildScoreCard(
+                '🤖 Bot',
+                gameState.botCard.markedCount,
+                theme.colorScheme.error,
+              ),
+            ],
           ),
         ],
       ),
@@ -300,6 +321,56 @@ class _GameScreenState extends State<GameScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showExitConfirmationDialog(BuildContext context, GameController gameController) {
+    final theme = Theme.of(context);
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: theme.colorScheme.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: Text(
+          'Leave Game?',
+          style: TextStyles.h3.copyWith(
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+        content: Text(
+          'Are you sure you want to leave? Your progress in this game will be lost.',
+          style: TextStyles.bodyMedium.copyWith(
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'STAY',
+              style: TextStyles.button.copyWith(
+                color: theme.colorScheme.tertiary,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // Close dialog
+              Navigator.pop(context); // Go back to previous screen
+              gameController.clearGame();
+            },
+            child: Text(
+              'LEAVE',
+              style: TextStyles.button.copyWith(
+                color: theme.colorScheme.error,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -188,6 +188,13 @@ class _SupportScreenState extends State<SupportScreen> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back,
+              color: theme.colorScheme.onPrimary,
+            ),
+            onPressed: () => Navigator.pop(context),
+          ),
           title: Text(
             'SUPPORT',
             style: TextStyles.h2.copyWith(color: theme.colorScheme.onPrimary),
