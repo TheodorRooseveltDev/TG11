@@ -15,6 +15,17 @@ PODS:
   - AppsFlyerFramework/Main (6.17.7)
   - audioplayers_darwin (0.0.1):
     - Flutter
+  - facebook_app_events (0.0.1):
+    - FBAudienceNetwork (~> 6.12)
+    - FBSDKCoreKit (~> 15.1)
+    - Flutter
+  - FBAEMKit (15.1.0):
+    - FBSDKCoreKit_Basics (= 15.1.0)
+  - FBAudienceNetwork (6.21.0)
+  - FBSDKCoreKit (15.1.0):
+    - FBAEMKit (= 15.1.0)
+    - FBSDKCoreKit_Basics (= 15.1.0)
+  - FBSDKCoreKit_Basics (15.1.0)
   - Flutter (1.0.0)
   - flutter_inappwebview_ios (0.0.1):
     - Flutter
@@ -90,6 +101,7 @@ DEPENDENCIES:
   - app_tracking_transparency (from `.symlinks/plugins/app_tracking_transparency/ios`)
   - appsflyer_sdk (from `.symlinks/plugins/appsflyer_sdk/ios`)
   - audioplayers_darwin (from `.symlinks/plugins/audioplayers_darwin/ios`)
+  - facebook_app_events (from `.symlinks/plugins/facebook_app_events/ios`)
   - Flutter (from `Flutter`)
   - flutter_inappwebview_ios (from `.symlinks/plugins/flutter_inappwebview_ios/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
@@ -102,6 +114,10 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - AppsFlyerFramework
+    - FBAEMKit
+    - FBAudienceNetwork
+    - FBSDKCoreKit
+    - FBSDKCoreKit_Basics
     - OneSignalXCFramework
     - OrderedSet
 
@@ -116,6 +132,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/appsflyer_sdk/ios"
   audioplayers_darwin:
     :path: ".symlinks/plugins/audioplayers_darwin/ios"
+  facebook_app_events:
+    :path: ".symlinks/plugins/facebook_app_events/ios"
   Flutter:
     :path: Flutter
   flutter_inappwebview_ios:
@@ -138,6 +156,11 @@ SPEC CHECKSUMS:
   appsflyer_sdk: 01d0cd834fe2fffd7f2372ab38690f7483587720
   AppsFlyerFramework: ae7caf1688348f2d7a742037bd4fc6966d39d362
   audioplayers_darwin: ccf9c770ee768abb07e26d90af093f7bab1c12ab
+  facebook_app_events: 61be57d11b1f1877ca116b15443422c2af27f7e1
+  FBAEMKit: c7f82b5145d446bcbbcd50485c032689032fc6a2
+  FBAudienceNetwork: f4ab9e073ab98c884dbdb5ffe7c861272b380bc2
+  FBSDKCoreKit: 7542746fc63a2a38dd6a865eeb54268341f37b83
+  FBSDKCoreKit_Basics: 92d6b26c0bed30ab09bbdd96dccaa26e6c9978d1
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_inappwebview_ios: b89ba3482b96fb25e00c967aae065701b66e9b99
   image_picker_ios: e0ece4aa2a75771a7de3fa735d26d90817041326

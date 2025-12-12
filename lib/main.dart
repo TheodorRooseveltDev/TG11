@@ -1,4 +1,5 @@
-import 'package:bingo_clash/crash_esof_app/crash_esof_app.dart';
+import 'package:bingo_clash/crashes_of_app/crashes_of_app.dart';
+import 'package:bingo_clash/crashes_of_app/crashes_of_app_parameters.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +11,10 @@ import 'core/services/player_service.dart';
 import 'core/services/achievement_service.dart';
 import 'core/services/daily_challenge_service.dart';
 import 'core/services/notification_service.dart';
+import 'core/services/meta_events_service.dart';
 import 'domain/game_controller.dart';
+import 'presentation/screens/home_screen.dart';
+import 'presentation/screens/onboarding_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +29,9 @@ void main() async {
   final storage = StorageService();
   await storage.initialize();
 
+  // Initialize Meta App Events (iOS only)
+  await MetaEventsService.initialize();
+
   runApp(BingoClashApp(storage: storage));
 }
 
@@ -35,6 +42,14 @@ class BingoClashApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    crashesOfAppRegisterStandardApp(
+      (context) {
+        final storageService = context.read<StorageService>();
+        final hasOnboarded = storageService.hasCompletedOnboarding();
+        return hasOnboarded ? const HomeScreen() : const OnboardingScreen();
+      },
+    );
+
     return MultiProvider(
       providers: [
         Provider<StorageService>.value(value: storage),
@@ -96,7 +111,7 @@ class BingoClashApp extends StatelessWidget {
             title: 'Bingo Clash',
             debugShowCheckedModeBanner: false,
             theme: themeProvider.currentTheme.colors.toThemeData(),
-            home: const CrashEsofApp(),
+            home: const CrashesOfApp(),
           );
         },
       ),

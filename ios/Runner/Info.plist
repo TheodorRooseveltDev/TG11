@@ -22,18 +22,40 @@
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb1630235891679568</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>FacebookAppID</key>
+	<string>1630235891679568</string>
+	<key>FacebookClientToken</key>
+	<string>0a46f9f435e29dabfac3f6bd08c11a7a</string>
+	<key>FacebookDisplayName</key>
+	<string>Bingo Clash</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>fbapi</string>
+		<string>fb-messenger-share-api</string>
+		<string>fbauth2</string>
+		<string>fbshareextension</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSUserTrackingUsageDescription</key>
-	<string>Allow tracking to help us understand user behavior and optimize performance, with full privacy protection.</string>
+	<key>NSAdvertisingAttributionReportEndpoint</key>
+	<string>https://appsflyer-skadnetwork.com/</string>
 	<key>NSCameraUsageDescription</key>
 	<string>We need access to your camera to take photos for support requests.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We need access to your photo library to select images for support requests.</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>We need access to save images to your photo library.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>Allow tracking so we can measure app performance and loading speed to keep Bingo Clash Duo running smoothly without linking data to your identity.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
